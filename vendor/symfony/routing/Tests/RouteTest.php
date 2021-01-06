@@ -203,6 +203,23 @@ class RouteTest extends TestCase
         $this->assertNotSame($route, $unserialized);
     }
 
+    public function testInlineDefaultAndRequirement()
+    {
+        $this->assertEquals((new Route('/foo/{bar}'))->setDefault('bar', null), new Route('/foo/{bar?}'));
+        $this->assertEquals((new Route('/foo/{bar}'))->setDefault('bar', 'baz'), new Route('/foo/{bar?baz}'));
+        $this->assertEquals((new Route('/foo/{bar}'))->setDefault('bar', 'baz<buz>'), new Route('/foo/{bar?baz<buz>}'));
+        $this->assertEquals((new Route('/foo/{!bar}'))->setDefault('!bar', 'baz<buz>'), new Route('/foo/{!bar?baz<buz>}'));
+        $this->assertEquals((new Route('/foo/{bar}'))->setDefault('bar', 'baz'), new Route('/foo/{bar?}', ['bar' => 'baz']));
+
+        $this->assertEquals((new Route('/foo/{bar}'))->setRequirement('bar', '.*'), new Route('/foo/{bar<.*>}'));
+        $this->assertEquals((new Route('/foo/{bar}'))->setRequirement('bar', '>'), new Route('/foo/{bar<>>}'));
+        $this->assertEquals((new Route('/foo/{bar}'))->setRequirement('bar', '\d+'), new Route('/foo/{bar<.*>}', [], ['bar' => '\d+']));
+        $this->assertEquals((new Route('/foo/{bar}'))->setRequirement('bar', '[a-z]{2}'), new Route('/foo/{bar<[a-z]{2}>}'));
+
+        $this->assertEquals((new Route('/foo/{bar}'))->setDefault('bar', null)->setRequirement('bar', '.*'), new Route('/foo/{bar<.*>?}'));
+        $this->assertEquals((new Route('/foo/{bar}'))->setDefault('bar', '<>')->setRequirement('bar', '>'), new Route('/foo/{bar<>>?<>}'));
+    }
+
     /**
      * Tests that the compiled version is also serialized to prevent the overhead
      * of compiling it again after unserialize.
@@ -254,5 +271,66 @@ class RouteTest extends TestCase
 
         $this->assertEquals($route, $unserialized);
         $this->assertNotSame($route, $unserialized);
+    }
+
+    /**
+     * @dataProvider provideNonLocalizedRoutes
+     */
+    public function testLocaleDefaultWithNonLocalizedRoutes(Route $route)
+    {
+        $this->assertNotSame('fr', $route->getDefault('_locale'));
+        $route->setDefault('_locale', 'fr');
+        $this->assertSame('fr', $route->getDefault('_locale'));
+    }
+
+    /**
+     * @dataProvider provideLocalizedRoutes
+     */
+    public function testLocaleDefaultWithLocalizedRoutes(Route $route)
+    {
+        $expected = $route->getDefault('_locale');
+        $this->assertIsString($expected);
+        $this->assertNotSame('fr', $expected);
+        $route->setDefault('_locale', 'fr');
+        $this->assertSame($expected, $route->getDefault('_locale'));
+    }
+
+    /**
+     * @dataProvider provideNonLocalizedRoutes
+     */
+    public function testLocaleRequirementWithNonLocalizedRoutes(Route $route)
+    {
+        $this->assertNotSame('fr', $route->getRequirement('_locale'));
+        $route->setRequirement('_locale', 'fr');
+        $this->assertSame('fr', $route->getRequirement('_locale'));
+    }
+
+    /**
+     * @dataProvider provideLocalizedRoutes
+     */
+    public function testLocaleRequirementWithLocalizedRoutes(Route $route)
+    {
+        $expected = $route->getRequirement('_locale');
+        $this->assertIsString($expected);
+        $this->assertNotSame('fr', $expected);
+        $route->setRequirement('_locale', 'fr');
+        $this->assertSame($expected, $route->getRequirement('_locale'));
+    }
+
+    public function provideNonLocalizedRoutes()
+    {
+        return [
+            [(new Route('/foo'))],
+            [(new Route('/foo'))->setDefault('_locale', 'en')],
+            [(new Route('/foo'))->setDefault('_locale', 'en')->setDefault('_canonical_route', 'foo')],
+            [(new Route('/foo'))->setDefault('_locale', 'en')->setDefault('_canonical_route', 'foo')->setRequirement('_locale', 'foobar')],
+        ];
+    }
+
+    public function provideLocalizedRoutes()
+    {
+        return [
+            [(new Route('/foo'))->setDefault('_locale', 'en')->setDefault('_canonical_route', 'foo')->setRequirement('_locale', 'en')],
+        ];
     }
 }

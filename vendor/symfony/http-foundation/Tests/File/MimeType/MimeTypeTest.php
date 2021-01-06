@@ -17,6 +17,7 @@ use Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesser;
 
 /**
  * @requires extension fileinfo
+ * @group legacy
  */
 class MimeTypeTest extends TestCase
 {
@@ -60,17 +61,8 @@ class MimeTypeTest extends TestCase
         $this->assertEquals('application/octet-stream', MimeTypeGuesser::getInstance()->guess(__DIR__.'/../Fixtures/.unknownextension'));
     }
 
-    /**
-     * @requires PHP 7.0
-     */
     public function testGuessWithDuplicatedFileType()
     {
-        if ('application/zip' === MimeTypeGuesser::getInstance()->guess(__DIR__.'/../Fixtures/test.docx')) {
-            $this->addToAssertionCount(1);
-
-            return;
-        }
-
         $this->assertSame('application/vnd.openxmlformats-officedocument.wordprocessingml.document', MimeTypeGuesser::getInstance()->guess(__DIR__.'/../Fixtures/test.docx'));
     }
 
@@ -102,7 +94,7 @@ class MimeTypeTest extends TestCase
         }
     }
 
-    public static function tearDownAfterClass()
+    public static function tearDownAfterClass(): void
     {
         $path = __DIR__.'/../Fixtures/to_delete';
         if (file_exists($path)) {

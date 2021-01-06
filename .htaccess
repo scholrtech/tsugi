@@ -9,3 +9,5 @@
 <IfModule !mod_rewrite.c>
     FallbackResource tsugi.php
 </IfModule>
+
+php_flag display_errors On

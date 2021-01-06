@@ -33,17 +33,17 @@ class MockFileSessionStorageTest extends TestCase
      */
     protected $storage;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->sessionDir = sys_get_temp_dir().'/sf2test';
+        $this->sessionDir = sys_get_temp_dir().'/sftest';
         $this->storage = $this->getStorage();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         array_map('unlink', glob($this->sessionDir.'/*'));
         if (is_dir($this->sessionDir)) {
-            rmdir($this->sessionDir);
+            @rmdir($this->sessionDir);
         }
         $this->sessionDir = null;
         $this->storage = null;
@@ -114,7 +114,7 @@ class MockFileSessionStorageTest extends TestCase
         $storage1->save();
     }
 
-    private function getStorage()
+    private function getStorage(): MockFileSessionStorage
     {
         $storage = new MockFileSessionStorage($this->sessionDir);
         $storage->registerBag(new FlashBag());

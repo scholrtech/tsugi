@@ -20,13 +20,14 @@ class RedirectResponseTest extends TestCase
     {
         $response = new RedirectResponse('foo.bar');
 
-        $this->assertRegExp('#<meta http-equiv="refresh" content="\d+;url=\'foo\.bar\'" />#', preg_replace('/\s+/', ' ', $response->getContent()));
+        $this->assertMatchesRegularExpression('#<meta http-equiv="refresh" content="\d+;url=\'foo\.bar\'" />#', preg_replace('/\s+/', ' ', $response->getContent()));
     }
 
-    public function testRedirectResponseConstructorNullUrl()
+    public function testRedirectResponseConstructorEmptyUrl()
     {
         $this->expectException('InvalidArgumentException');
-        new RedirectResponse(null);
+        $this->expectExceptionMessage('Cannot redirect to an empty URL.');
+        new RedirectResponse('');
     }
 
     public function testRedirectResponseConstructorWrongStatusCode()

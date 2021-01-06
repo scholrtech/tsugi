@@ -26,7 +26,7 @@ class StoreTest extends TestCase
      */
     protected $store;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->request = Request::create('/');
         $this->response = new Response('hello world', 200, []);
@@ -36,7 +36,7 @@ class StoreTest extends TestCase
         $this->store = new Store(sys_get_temp_dir().'/http_cache');
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->store = null;
         $this->request = null;
@@ -92,7 +92,7 @@ class StoreTest extends TestCase
     {
         $cacheKey = $this->storeSimpleEntry();
         $entries = $this->getStoreMetadata($cacheKey);
-        list(, $res) = $entries[0];
+        [, $res] = $entries[0];
 
         $this->assertEquals('en9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08', $res['x-content-digest'][0]);
     }
@@ -103,7 +103,7 @@ class StoreTest extends TestCase
 
         $cacheKey = $this->store->write($this->request, $response);
         $entries = $this->getStoreMetadata($cacheKey);
-        list(, $res) = $entries[0];
+        [, $res] = $entries[0];
 
         $this->assertEquals('en9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08', $res['x-content-digest'][0]);
         $this->assertEquals('en9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08', $response->headers->get('X-Content-Digest'));

@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpKernel\Tests\Fixtures;
 
 use Symfony\Component\Config\Loader\LoaderInterface;
+use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Symfony\Component\HttpKernel\Kernel;
 
 class KernelForTest extends Kernel
@@ -21,7 +22,7 @@ class KernelForTest extends Kernel
         return $this->bundleMap;
     }
 
-    public function registerBundles()
+    public function registerBundles(): iterable
     {
         return [];
     }
@@ -35,7 +36,7 @@ class KernelForTest extends Kernel
         return $this->booted;
     }
 
-    public function getProjectDir()
+    public function getProjectDir(): string
     {
         return __DIR__;
     }

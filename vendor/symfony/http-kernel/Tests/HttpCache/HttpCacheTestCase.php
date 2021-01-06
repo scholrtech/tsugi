@@ -35,7 +35,7 @@ class HttpCacheTestCase extends TestCase
      */
     protected $store;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->kernel = null;
 
@@ -53,7 +53,7 @@ class HttpCacheTestCase extends TestCase
         $this->clearDirectory(sys_get_temp_dir().'/http_cache');
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         if ($this->cache) {
             $this->cache->getStore()->cleanup();
@@ -91,7 +91,7 @@ class HttpCacheTestCase extends TestCase
         $traces = $this->cache->getTraces();
         $traces = current($traces);
 
-        $this->assertRegExp('/'.$trace.'/', implode(', ', $traces));
+        $this->assertMatchesRegularExpression('/'.$trace.'/', implode(', ', $traces));
     }
 
     public function assertTraceNotContains($trace)
@@ -99,7 +99,7 @@ class HttpCacheTestCase extends TestCase
         $traces = $this->cache->getTraces();
         $traces = current($traces);
 
-        $this->assertNotRegExp('/'.$trace.'/', implode(', ', $traces));
+        $this->assertDoesNotMatchRegularExpression('/'.$trace.'/', implode(', ', $traces));
     }
 
     public function assertExceptionsAreCaught()
@@ -122,7 +122,9 @@ class HttpCacheTestCase extends TestCase
 
         $this->store = new Store(sys_get_temp_dir().'/http_cache');
 
-        $this->cacheConfig['debug'] = true;
+        if (!isset($this->cacheConfig['debug'])) {
+            $this->cacheConfig['debug'] = true;
+        }
 
         $this->esi = $esi ? new Esi() : null;
         $this->cache = new HttpCache($this->kernel, $this->store, $this->esi, $this->cacheConfig);

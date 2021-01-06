@@ -43,18 +43,18 @@ class TestHttpKernel extends HttpKernel implements ControllerResolverInterface, 
     {
         $trustedConfig = [Request::getTrustedProxies(), Request::getTrustedHeaderSet()];
 
-        list($trustedProxies, $trustedHeaderSet, $backendRequest) = $this->backendRequest;
+        [$trustedProxies, $trustedHeaderSet, $backendRequest] = $this->backendRequest;
         Request::setTrustedProxies($trustedProxies, $trustedHeaderSet);
 
         try {
             $callback($backendRequest);
         } finally {
-            list($trustedProxies, $trustedHeaderSet) = $trustedConfig;
+            [$trustedProxies, $trustedHeaderSet] = $trustedConfig;
             Request::setTrustedProxies($trustedProxies, $trustedHeaderSet);
         }
     }
 
-    public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = false)
+    public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = false): Response
     {
         $this->catch = $catch;
         $this->backendRequest = [Request::getTrustedProxies(), Request::getTrustedHeaderSet(), $request];
@@ -72,7 +72,7 @@ class TestHttpKernel extends HttpKernel implements ControllerResolverInterface, 
         return [$this, 'callController'];
     }
 
-    public function getArguments(Request $request, $controller)
+    public function getArguments(Request $request, $controller): array
     {
         return [$request];
     }

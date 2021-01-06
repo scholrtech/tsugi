@@ -20,9 +20,9 @@ class FileProfilerStorageTest extends TestCase
     private $tmpDir;
     private $storage;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->tmpDir = sys_get_temp_dir().'/sf2_profiler_file_storage';
+        $this->tmpDir = sys_get_temp_dir().'/sf_profiler_file_storage';
         if (is_dir($this->tmpDir)) {
             self::cleanDir();
         }
@@ -30,7 +30,7 @@ class FileProfilerStorageTest extends TestCase
         $this->storage->purge();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         self::cleanDir();
     }
@@ -293,8 +293,8 @@ class FileProfilerStorageTest extends TestCase
 
         $tokens = $this->storage->find('', '', 10, '');
         $this->assertCount(2, $tokens);
-        $this->assertContains($tokens[0]['status_code'], [200, 404]);
-        $this->assertContains($tokens[1]['status_code'], [200, 404]);
+        $this->assertContains((int) $tokens[0]['status_code'], [200, 404]);
+        $this->assertContains((int) $tokens[1]['status_code'], [200, 404]);
     }
 
     public function testMultiRowIndexFile()
@@ -329,7 +329,7 @@ class FileProfilerStorageTest extends TestCase
         $h = tmpfile();
 
         fwrite($h, "line1\n\n\nline2\n");
-        fseek($h, 0, SEEK_END);
+        fseek($h, 0, \SEEK_END);
 
         $this->assertEquals('line2', $r->invoke($this->storage, $h));
         $this->assertEquals('line1', $r->invoke($this->storage, $h));

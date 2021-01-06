@@ -18,6 +18,11 @@ register_shutdown_function('__the_end');
 // otherwise this will resolve incorrectly.
 $dirroot = realpath(dirname(__FILE__));
 
+// Setup I18N before autoload to prevent Laravel helpers from overriding translation function __()
+// These two lines must be before autoload.php
+require_once ($dirroot."/vendor/tsugi/lib/src/Core/I18N.php");
+require_once ($dirroot."/vendor/tsugi/lib/include/setup_i18n.php");
+
 $loader = require_once($dirroot."/vendor/autoload.php");
 
 // If we just are using Tsugi but not part of another site
@@ -502,6 +507,8 @@ if ( isset($CFG->apphome) && $CFG->apphome ) {
 $CFG->vendorroot = $CFG->wwwroot."/vendor/tsugi/lib/util";
 $CFG->vendorinclude = $CFG->dirroot."/vendor/tsugi/lib/include";
 $CFG->vendorstatic = $CFG->wwwroot."/vendor/tsugi/lib/static";
+
+$CFG->lumen_storage = $CFG->dirroot."/storage/";
 
 // Leave these here
 require_once $CFG->vendorinclude."/setup.php";
